@@ -9,6 +9,7 @@ import logging
 from logging import Formatter, FileHandler
 from forms import *
 import os
+from flask_cors import CORS
 
 #----------------------------------------------------------------------------#
 # App Config.
@@ -16,6 +17,7 @@ import os
 
 app = Flask(__name__)
 app.config.from_object('config')
+cors = CORS(app, resources=(r"/*": {"origins": "*"}))
 #db = SQLAlchemy(app)
 
 # Automatically tear down SQLAlchemy.
@@ -92,14 +94,8 @@ if not app.debug:
 
 # Default port:
 if __name__ == '__main__':
-    app.run()
-
-# Or specify port manually:
-'''
-if __name__ == '__main__':
-    port = int(os.environ.get('PORT', 5000))
-    app.run(host='0.0.0.0', port=port)
-'''
+    port = int(os.environ.get('PORT', 8000))
+    app.run(host='0.0.0.0', port=port,debug=True)
 
 #funcrions
 def json_answer(best_moves, possible_moves, answer, mate):
