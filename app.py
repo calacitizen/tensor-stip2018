@@ -45,16 +45,31 @@ def login_required(test):
 # Controllers.
 #----------------------------------------------------------------------------#
 #funcrions
-def parse_question(question, new_turn):
-    skinut' ' pastebin
+def generate_text(question, new_turn):
+    #skinut' ' pastebin
     answer = ''
     if question[:16].lower() == 'какой лучший ход':
-        best_move = new_turn[best_moves][0]
-        if 'x' in best_move:
-           # answer = 'Предлагаю съесть' + 
+        best_move = new_turn['best_moves'][0]
+        if 'x' in best_move['move']:
+            pass
+            #answer = 'Предлагаю съесть' + 
         else:
-            #answer = 'Предлагаю сходить ' + piece() + ' на ' + cell()
+            answer = 'Предлагаю сходить ' + piece(best_move['move'][0]) + ' на ' + best_move['full_move'][1:3]
+    print(answer)
     return answer
+
+def piece(char):
+    pieces = {
+        'K' : 'королем',
+        'Q' : 'ферзем',
+        'R' : 'ладьей',
+        'B' : 'слоном',
+        'N' : 'конем'
+    }
+    if char in pieces:
+        return pieces[char]
+    else:
+        return 'пешкой'
 
 def json_answer(best_moves, possible_moves, answer, mate):
     return jsonify({
@@ -65,12 +80,26 @@ def json_answer(best_moves, possible_moves, answer, mate):
     })
 
 def get_answer(state):
+    # return {
+    # "possible_moves": [],
+    # "best_moves": [{
+    #     "full_move": "f1e1",
+    #     "mate": False,
+    #     "move": "Re1",
+    #     "score": 1.58
+    #   }],
+    # "answer": "Если сходишь правильно, можешь поставить мат."
+    # }
     with open('game-temp.json') as f:
         game = json.load(f)
     if state in game:
         return game[state]
     else:
-        return ([], [], 'answer', False) 
+        return {
+            "possible_moves": [],
+            "best_moves": [],
+            "answer": "ERROR!!!11 no such turn in test json"
+        }
 
 
 
@@ -111,11 +140,12 @@ def hint():
         question = data['question']
         new_answer = get_answer(state)
         mate = False
+        #question = 'Какой лучший ход'
         if question != '':
             text = generate_text(question, new_answer)
         new_answer = get_answer(state)
         mate = False
-        # return json_answer(new_answer['best_moves'], new_answer['possible_moves'], text, mate)
+        #return json_answer(new_answer['best_moves'], new_answer['possible_moves'], text, mate)
         return json_answer(new_answer['best_moves'], new_answer['possible_moves'], new_answer['answer'], mate)
     else:
         return json_answer([], [], 'Ошибка!', False)
