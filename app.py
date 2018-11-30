@@ -51,25 +51,51 @@ def generate_text(question, new_turn):
     if question[:16].lower() == 'какой лучший ход':
         best_move = new_turn['best_moves'][0]
         if 'x' in best_move['move']:
-            pass
-            #answer = 'Предлагаю съесть' + 
+            answer = 'Предлагаю ' + piece(best_move['move'][0], 't') + ' съесть ' + pice(who_on(best_move['full_move'][1:3]), 'v') + ' на ' + best_move['full_move'][1:3]
         else:
-            answer = 'Предлагаю сходить ' + piece(best_move['move'][0]) + ' на ' + best_move['full_move'][1:3]
+            answer = 'Предлагаю сходить ' + piece(best_move['move'][0], 't') + ' на ' + best_move['full_move'][1:3]
     print(answer)
     return answer
 
-def piece(char):
-    pieces = {
-        'K' : 'королем',
-        'Q' : 'ферзем',
-        'R' : 'ладьей',
-        'B' : 'слоном',
-        'N' : 'конем'
-    }
-    if char in pieces:
-        return pieces[char]
+def who_on(cell):
+    a = ord('a')
+    board = state.split('/')
+    for j in range(0,8):
+        for i in range(0,9):
+            string[j] = string[j].replace(str(i), '.'*i)
+    value = board[a - ord(cell[0])][cell[1]]
+    if value != '.':
+        return value
     else:
-        return 'пешкой'
+        return 'Empty'
+
+def piece(char, case):
+    pieces = {
+        't': {
+            'K' : 'королем',
+            'Q' : 'ферзем',
+            'R' : 'ладьей',
+            'B' : 'слоном',
+            'N' : 'конем'
+        },
+        'v' : {
+            'K' : 'короля',
+            'Q' : 'ферзя',
+            'R' : 'ладью',
+            'B' : 'слона',
+            'N' : 'коня'
+        }
+    }
+    pawn = {
+        't' : 'пешкой',
+        'v' : 'пешку'}
+    if case in pieces:
+        if char in pieces[case]:
+            return pieces[case][char]
+        else:
+            return pawn[case]
+    else:
+        return ''
 
 def json_answer(best_moves, possible_moves, answer, mate):
     return jsonify({
@@ -80,16 +106,16 @@ def json_answer(best_moves, possible_moves, answer, mate):
     })
 
 def get_answer(state):
-    # return {
-    # "possible_moves": [],
-    # "best_moves": [{
-    #     "full_move": "f1e1",
-    #     "mate": False,
-    #     "move": "Re1",
-    #     "score": 1.58
-    #   }],
-    # "answer": "Если сходишь правильно, можешь поставить мат."
-    # }
+    return {
+    "possible_moves": [],
+    "best_moves": [{
+        "full_move": "f1e1",
+        "mate": False,
+        "move": "Re1",
+        "score": 1.58
+      }],
+    "answer": "Если сходишь правильно, можешь поставить мат."
+    }
     with open('game-temp.json') as f:
         game = json.load(f)
     if state in game:
@@ -130,6 +156,7 @@ def forgot():
     form = ForgotForm(request.form)
     return render_template('forms/forgot.html', form=form)
 
+state = '' # current board state
 @app.route('/hint', methods=['POST'])
 def hint():
     if request.method == 'POST':
