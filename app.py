@@ -49,8 +49,11 @@ def home():
 @app.route('/hint', methods=['POST'])
 def hint():
     if request.method == 'POST':
-        json_data = request.get_json();
-        print(json_data)
+        data = request.get_json()
+        state = data['board']
+        question = data['question']
+        print(state, question)
+        #data = json.loads(json_data)
         return answer(['e1'], ['e2'], 'answer')
         #return answer(best_moves, possible_moves, answer)
     else:
