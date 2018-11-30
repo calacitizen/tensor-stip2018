@@ -63,7 +63,7 @@ def who_on(cell):
     for j in range(0,8):
         for i in range(0,9):
             board[j] = board[j].replace(str(i), '.'*i)
-    value = board[a - ord(cell[0])][cell[1]]
+    value = board[a - ord(cell[0])][cell[1]].upper()
     if value != '.':
         return value
     else:
