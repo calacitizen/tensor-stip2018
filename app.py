@@ -51,7 +51,8 @@ def hint():
     if request.method == 'POST':
         json_data = request.get_json();
         print(json_data)
-        return answer(best_moves, possible_moves, answer)
+        return answer(['e1'], ['e2'], 'answer')
+        #return answer(best_moves, possible_moves, answer)
     else:
         return 'error'
 # Error handlers.
