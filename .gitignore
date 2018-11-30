@@ -2,3 +2,5 @@
 .DS_Store
 env
 venv
+stockfish/
+.idea/
