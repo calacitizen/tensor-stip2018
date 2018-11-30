@@ -2,7 +2,8 @@
 # Imports
 #----------------------------------------------------------------------------#
 
-from flask import Flask, render_template, request
+from flask import Flask, render_template, request, jsonify
+import json
 # from flask.ext.sqlalchemy import SQLAlchemy
 import logging
 from logging import Formatter, FileHandler
@@ -43,31 +44,16 @@ def login_required(test):
 
 @app.route('/')
 def home():
-    return render_template('pages/placeholder.home.html')
+    return 'hi'
 
-
-@app.route('/about')
-def about():
-    return render_template('pages/placeholder.about.html')
-
-
-@app.route('/login')
-def login():
-    form = LoginForm(request.form)
-    return render_template('forms/login.html', form=form)
-
-
-@app.route('/register')
-def register():
-    form = RegisterForm(request.form)
-    return render_template('forms/register.html', form=form)
-
-
-@app.route('/forgot')
-def forgot():
-    form = ForgotForm(request.form)
-    return render_template('forms/forgot.html', form=form)
-
+@app.route('/hint', methods=['POST'])
+def hint():
+    if request.method == 'POST':
+        json_data = request.get_json();
+        print(json_data)
+        return answer(best_moves, possible_moves, answer)
+    else:
+        return 'error'
 # Error handlers.
 
 
@@ -105,3 +91,11 @@ if __name__ == '__main__':
     port = int(os.environ.get('PORT', 5000))
     app.run(host='0.0.0.0', port=port)
 '''
+
+#funcrions
+def answer(best_moves, possible_moves, answer):
+    return jsonify({
+        'bestMoves': best_moves,
+        'possibleMoves': possible_moves,
+        'answer': answer
+    })
