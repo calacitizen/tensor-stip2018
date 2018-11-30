@@ -947,6 +947,8 @@ def hint():
             return answer([], [], 'Error: no board information sent', False)
         state = data['board']
         question = data['question']
+        if question != '':
+            parse_question(question);
         new_answer = get_answer(state)
         mate = False
         return json_answer(new_answer['best_moves'], new_answer['possible_moves'], new_answer['answer'], mate)
