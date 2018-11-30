@@ -45,6 +45,17 @@ def login_required(test):
 # Controllers.
 #----------------------------------------------------------------------------#
 #funcrions
+def parse_question(question, new_turn):
+    skinut' ' pastebin
+    answer = ''
+    if question[:16].lower() == 'какой лучший ход':
+        best_move = new_turn[best_moves][0]
+        if 'x' in best_move:
+           # answer = 'Предлагаю съесть' + 
+        else:
+            #answer = 'Предлагаю сходить ' + piece() + ' на ' + cell()
+    return answer
+
 def json_answer(best_moves, possible_moves, answer, mate):
     return jsonify({
         'best_moves': best_moves,
@@ -98,10 +109,13 @@ def hint():
             return json_answer([], [], 'Error: no board information sent', False)
         state = data['board']
         question = data['question']
-        if question != '':
-            parse_question(question);
         new_answer = get_answer(state)
         mate = False
+        if question != '':
+            text = generate_text(question, new_answer)
+        new_answer = get_answer(state)
+        mate = False
+        # return json_answer(new_answer['best_moves'], new_answer['possible_moves'], text, mate)
         return json_answer(new_answer['best_moves'], new_answer['possible_moves'], new_answer['answer'], mate)
     else:
         return json_answer([], [], 'Ошибка!', False)
