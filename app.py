@@ -62,7 +62,7 @@ def who_on(cell):
     board = state.split('/')
     for j in range(0,8):
         for i in range(0,9):
-            string[j] = string[j].replace(str(i), '.'*i)
+            board[j] = board[j].replace(str(i), '.'*i)
     value = board[a - ord(cell[0])][cell[1]]
     if value != '.':
         return value
