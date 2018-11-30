@@ -50,12 +50,17 @@ def home():
 def hint():
     if request.method == 'POST':
         data = request.get_json()
-        if 'board' not in data
+        if not ('board' in data):
             return answer([], [], 'Error: no board information sent', False)
         state = data['board']
         question = data['question']
-        mate = False
-        return answer(['e1'], ['e2'], 'answer', mate)
+        new_answer = get_answer(state)
+        best_moves = new_answer[0]
+        possible_moves = new_answer[1]
+        answer = new_answer[2]
+        mate = new_answer[3]
+        print(answer)
+        return json_answer(best_moves, possible_moves, answer, mate)
     else:
         return answer([], [], 'Ошибка!', False)
 # Error handlers.
@@ -97,10 +102,40 @@ if __name__ == '__main__':
 '''
 
 #funcrions
-def answer(best_moves, possible_moves, answer, mate):
+def json_answer(best_moves, possible_moves, answer, mate):
     return jsonify({
-        'bestMoves': best_moves,
-        'possibleMoves': possible_moves,
-        'answer': answer
+        'best_moves': best_moves,
+        'possible_moves': possible_moves,
+        'answer': answer,
         'mate' : mate
     })
+
+def get_answer(state):
+    game = {
+        'rnbqkbnr/pppp1ppp/8/4p3/4P3/8/PPPP1PPP/RNBQKBNR w KQkq e6 0 2': (['e2-e3'], ['e1-e3', 'e3-e5'], 'Возможное ходы e2-e3, e1-e3, e3-e5', False),
+        'r1bqkb1r/ppp2ppp/2n2n2/3pp3/4P3/P1N2N2/1PPP1PPP/R1BQKB1R w KQkq d6 0 5': (['e2-e3'], ['e1-e3', 'e3-e5'], 'Я бы предложила съесть пешку на d5', False),
+        'r1bqkb1r/ppp2ppp/2n5/3np3/8/P1N2N2/1PPP1PPP/R1BQKB1R w KQkq - 0 6': (['e2-e3'], ['e1-e3', 'e3-e5'], 'Ты только что спрашивал, в этот раз подумай сам. Ты же хочешь научиться играть.', False),
+        'r1bqkb1r/ppp2ppp/2n5/8/4Nn2/P4N2/1PPPBPPP/R1BQK2R w KQkq - 1 8': (['e2-e3'], ['e1-e3', 'e3-e5'], 'Пожалуй стоит сделать рокировку', False),
+        'r1bqkb1r/ppp2ppp/2n5/8/4N3/P4N2/1PPPnPPP/R1BQ1RK1 w kq - 0 9':  (['e2-e3'], ['e1-e3', 'e3-e5'], 'кажется вам поставили шах', False),
+        'r2qkb1r/ppp2ppp/2n5/8/4N1b1/P4N2/1PPPQPPP/R1B2RK1 w kq - 1 10': (['e2-e3'], ['e1-e3', 'e3-e5'], 'Если сходишь правильно, можешь поставить мат', False),
+        'r2qkb1r/ppp2ppp/2n2N2/8/6b1/P4N2/1PPPQPPP/R1B2RK1 b kq - 2 10': (['e2-e3'], ['e1-e3', 'e3-e5'], 'Шах и мат! Ты победил! Поздравляю!', False)
+    }
+    if state in game:
+        return game[state]
+    else:
+        return ([], [], 'answer', False) 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
