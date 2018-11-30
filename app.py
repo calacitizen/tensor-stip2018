@@ -50,14 +50,14 @@ def home():
 def hint():
     if request.method == 'POST':
         data = request.get_json()
+        if 'board' not in data
+            return answer([], [], 'Error: no board information sent', False)
         state = data['board']
         question = data['question']
-        print(state, question)
-        #data = json.loads(json_data)
-        return answer(['e1'], ['e2'], 'answer')
-        #return answer(best_moves, possible_moves, answer)
+        mate = False
+        return answer(['e1'], ['e2'], 'answer', mate)
     else:
-        return 'error'
+        return answer([], [], 'Ошибка!', False)
 # Error handlers.
 
 
@@ -97,9 +97,10 @@ if __name__ == '__main__':
 '''
 
 #funcrions
-def answer(best_moves, possible_moves, answer):
+def answer(best_moves, possible_moves, answer, mate):
     return jsonify({
         'bestMoves': best_moves,
         'possibleMoves': possible_moves,
         'answer': answer
+        'mate' : mate
     })
