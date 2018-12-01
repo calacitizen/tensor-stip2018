@@ -4,3 +4,4 @@ env
 venv
 stockfish/
 .idea/
+stockfish.conf
