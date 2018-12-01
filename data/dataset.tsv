@@ -4,3 +4,9 @@ question	answer
 Как ходит	how_piece_goes
 Как передвигается	how_piece_goes
 Что такое	whats
+Какие доступные ходы	available_moves
+Какие возможные ходы	available_moves
+Как я могу сходить	available_moves
+Что стоит на позиции	whats_on
+Какая фигура находится на позиции	whats_on
+Что находится на позиции	whats_on
