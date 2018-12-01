@@ -178,18 +178,20 @@ class Generator:
         if len(moves) == 0:
             return HintService.to_dict(answer='Доступных ходов нет.')
         if move_type == 'best':
+            #  moves[0]['move'] = 'O-O'
             main_move = moves[0]['move']
+            #  moves[0]['full_move'] = 'e2e4'
             answer = ''
             if 'O-O-O' in main_move:
                 answer = 'Можно сделать рокировку с левой ладьей.'
             elif 'O-O' in main_move:
                 answer = 'Можно сделать рокировку с правой ладьей.'
             elif '=' in main_move:
-                answer = 'Предлагаю превратить пешку на ' + main_move[:2] + ' в ' + Generator.__piece(main_move[2],
-                                                                                                      'v') + '.'
+                answer = 'Предлагаю превратить пешку на ' + main_move[:2] + ' в ' + Generator.__piece(main_move[3], 'v') + '.'
+                print(main_move[2])
             elif 'x' in main_move:
-                if Generator.__piece(main_move[0], 't') == 'пешкой':
-                    answer = 'Предлагаю ' + Generator.__piece(main_move[0], 't') + ' на ' + moves[0]['full_move'][:3] +  ' съесть ' + \
+                #if Generator.__piece(main_move[0], 't') == 'пешкой':
+                    answer = 'Предлагаю ' + Generator.__piece(main_move[0], 't') + ' на ' + moves[0]['full_move'][:2] +  ' съесть ' + \
                              Generator.__piece(Generator.__who_on(args['fen'], moves[0]['full_move'][2:4]),
                                                'v') + ' на ' + moves[0]['full_move'][2:4] + '.'
             if '+' in main_move:
@@ -231,7 +233,7 @@ class Generator:
         if value != '.':
             return value
         else:
-            return 'пустая'
+            return 'пустую клетку'
 
     @staticmethod
     def whats(args):
