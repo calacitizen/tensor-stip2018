@@ -37,6 +37,13 @@ class ChessBoard:
         self.__engine.info_handlers.append(self.__info_handler)
         self.__movetime = movetime
 
+    @staticmethod
+    def convert(move):
+        return {
+            'from': (ord(move[0]) - 97, 8 - int(move[1])),
+            'to': (ord(move[2]) - 97, 8 - int(move[3]))
+        }
+
     def get_moves(self, fen, filt=None, reverse=False):
         board = chess.Board(fen=fen)
         self.__engine.position(board)
@@ -54,7 +61,8 @@ class ChessBoard:
                 "mate": False if mate is None else (True if mate > 0 else False),
                 "move": board.san(move),
                 "score": round((0 if (score is None and mate is not None and mate < 0) else 999 \
-                    if (score is None and mate is not None and mate > 0) else score) / 100.0, 2)
+                    if (score is None and mate is not None and mate > 0) else score) / 100.0, 2),
+                "coord": ChessBoard.convert(move.uci())
             })
         moves.sort(key=lambda x: -x['score'], reverse=reverse)
         moves.sort(key=lambda x: not x['mate'], reverse=reverse)
