@@ -20,6 +20,21 @@ RULE_TERMS = [
     'рокировка'
 ]
 
+PIECES_DIC = {
+    'K': ['король', 'короля', 'королю', 'короля', 'королем', 'короле'],
+    'Q': ['ферзь', 'ферзя', 'ферзю', 'ферзя', 'ферзем', 'ферзе'],
+    'R': ['ладья', 'ладьи', 'ладье', 'ладью', 'ладьей', 'ладье'],
+    'N': ['конь', 'коня', 'коню', 'коня', 'конем', 'коне'],
+    'B': ['слон', 'слона', 'слону', 'слона', 'слоном', 'слоне'],
+    '&': ['пешка', 'пешки', 'пешке', 'пешку', 'пешкой', 'пешке']
+}
+
+OPERATIONS = {
+    'x': ['атаковать', 'съесть'],
+    '+': ['поставить шах'],
+    '#': ['объявить мат']
+}
+
 
 class ChessBoard:
 
@@ -131,18 +146,98 @@ class Generator:
         return HintService.to_dict(answer=result)
 
     @staticmethod
+    def __piece(char, case):
+        pieces = {
+            't': {
+                'K' : 'королем',
+                'Q' : 'ферзем',
+                'R' : 'ладьей',
+                'B' : 'слоном',
+                'N' : 'конем'
+            },
+            'v' : {
+                'K' : 'короля',
+                'Q' : 'ферзя',
+                'R' : 'ладью',
+                'B' : 'слона',
+                'N' : 'коня'
+            }
+        }
+        pawn = {
+            't' : 'пешкой',
+            'v' : 'пешку'}
+        if case in pieces:
+            if char in pieces[case]:
+                return pieces[case][char]
+            else:
+                return pawn[case]
+        else:
+            return ''
+
+    @staticmethod
     def get_move(args, move_type='best'):
         if args is None:
-            return HintService.to_dict(answer='Чем ходить будете?')
+            return HintService.to_dict(answer='Кажется, кто-то спрятал от меня шахматную доску?')
         # TODO: filter
         cb = ChessBoard()
         moves = cb.get_moves(args['fen'])
         if len(moves) == 0:
             return HintService.to_dict(answer='Доступных ходов нет.')
         if move_type == 'best':
-            return HintService.to_dict(answer='Вот вам лучший ход.', best=[moves[0]], mate=False)
+            main_move = moves[0]['move']
+            answer = ''
+            if 'O-O-O' in main_move:
+                answer = 'Можно сделать рокировку с левой ладьей.'
+            elif 'O-O' in main_move:
+                answer = 'Можно сделать рокировку с правой ладьей.'
+            elif '=' in main_move:
+                answer = 'Предлагаю превратить пешку на ' + main_move[:2] + ' в ' + Generator.__piece(main_move[2], 'v') + '.'
+            elif 'x' in main_move:
+                if Generator.__piece(main_move[0], 't') == 'пешкой':
+                    answer = 'Предлагаю ' + Generator.__piece(main_move[0], 't') + ' съесть ' + \
+                             Generator.__piece(Generator.__who_on(args['fen'], moves[0]['full_move'][2:4]),
+                                               'v') + ' на ' + moves[0]['full_move'][2:4] + '.'
+            if '+' in main_move:
+                if answer[-1] == '.':
+                    answer[-1] = ' '
+                    answer += 'и поставить шах.'
+                else:
+                    answer = 'Можно поставить шах, сходив'
+                    p = Generator.__piece(main_move[0], 't')
+                    if p == 'пешкой':
+                        answer += ' ' + p + ' на ' + main_move[:2] + '.'
+                    else:
+                        answer += ' ' + p + ' на ' + main_move[1:3] + '.'
+            if '#' in main_move:
+                if answer[-1] == '.':
+                    answer[-1] = ' '
+                    answer += 'и поставить мат.'
+                else:
+                    answer = 'Есть возможность поставить мат, сходив'
+                    p = Generator.__piece(main_move[0], 't')
+                    if p == 'пешкой':
+                        answer += ' ' + p + ' на ' + main_move[:2] + '.'
+                    else:
+                        answer += ' ' + p + ' на ' + main_move[1:3] + '.'
+            if len(answer) == 0:
+                return HintService.to_dict(answer='Вот вам лучший ход.', best=[moves[0]], mate=False)
+            return HintService.to_dict(answer=answer, best=[moves[0]], mate=False)
         else:
-            return HintService.to_dict(answer='Вот вам возможные ход.', best=moves)
+            return HintService.to_dict(answer='Вот вам возможные ходы.', best=moves)
+
+    @staticmethod
+    def __who_on(fen, cell):
+        a = ord('a')
+        board = fen.split('/')
+        for j in range(0, 8):
+            for i in range(0, 9):
+                board[j] = board[j].replace(str(i), '.' * i)
+        # белые обозначаются большими буквами
+        value = board[7 - (int(cell[1]) - 1)][ord(cell[0]) - a].upper()
+        if value != '.':
+            return value
+        else:
+            return 'пустая'
 
     @staticmethod
     def whats(args):
