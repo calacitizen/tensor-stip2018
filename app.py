@@ -5,7 +5,7 @@
 #----------------------------------------------------------------------------#
 
 from flask import Flask, render_template, request, jsonify
-import json
+from json import loads, dumps
 # from flask.ext.sqlalchemy import SQLAlchemy
 import logging
 from logging import Formatter, FileHandler
@@ -14,6 +14,8 @@ import os
 from flask_cors import CORS
 from hint_utils import HintService
 from pandas import read_csv
+import chess
+import chess.uci
 
 #----------------------------------------------------------------------------#
 # App Config.
@@ -74,15 +76,32 @@ def forgot():
     form = ForgotForm(request.form)
     return render_template('forms/forgot.html', form=form)
 
+last_board = None
+last_hint = None
 @app.route('/hint', methods=['POST'])
 def hint():
+    global last_board
+    global last_hint
     if request.method == 'POST':
         data = request.get_json()
+        if (last_hint != None) and (last_board != None) and (len(last_hint['best_moves']) != 0) and (last_hint['answer'] == ''):
+            last_best = last_hint['best_moves'][0]
+            current_board = chess.BaseBoard(data['board'].split()[0])
+            if ' b ' in data['board']:
+                if current_board.piece_at(chess.SQUARE_NAMES.index(last_best['full_move'][2:4])) == last_board.piece_at(chess.SQUARE_NAMES.index(last_best['full_move'][:2])):
+                    return jsonify({
+                        'answer' : 'Молодец, хороший ход.',
+                        'best_moves' : [],
+                        "possible_moves":[],
+                        "mate":False
+                        })
         if not 'board' in data:
             return {}
         csv = read_csv("data/dataset.tsv", sep='\t')
         hint = HintService(knowledge=csv)
         json = hint.ask(data['board'], data['question'])
+        last_board = chess.BaseBoard(data['board'].split()[0])
+        last_hint = loads(json)
         return json
     else:
         return {}
