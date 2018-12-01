@@ -260,13 +260,13 @@ class Generator:
     def secret_check(args):
         board = chess.Board(fen=args['fen'])
         if board.is_check():
-            return HintService.to_dict(answer='Шах!')
+            return HintService.to_dict(answer='Кажется, вам поставили шах.')
         elif board.is_stalemate():
             return HintService.to_dict(answer='Мат!')
         elif board.is_stalemate():
-            return HintService.to_dict(answer='Пат!')
+            return HintService.to_dict(answer='Это пат.')
         elif board.is_insufficient_material():
-            return HintService.to_dict(answer='Ничья!')
+            return HintService.to_dict(answer='Ничья.')
         return HintService.to_dict()
 
 
