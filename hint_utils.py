@@ -194,7 +194,7 @@ class Generator:
                 answer = 'Предлагаю превратить пешку на ' + main_move[:2] + ' в ' + Generator.__piece(main_move[2], 'v') + '.'
             elif 'x' in main_move:
                 if Generator.__piece(main_move[0], 't') == 'пешкой':
-                    answer = 'Предлагаю ' + Generator.__piece(main_move[0], 't') + ' съесть ' + \
+                    answer = 'Предлагаю ' + Generator.__piece(main_move[0], 't') + ' на ' + moves[0]['full_move'][:3] +  ' съесть ' + \
                              Generator.__piece(Generator.__who_on(args['fen'], moves[0]['full_move'][2:4]),
                                                'v') + ' на ' + moves[0]['full_move'][2:4] + '.'
             if '+' in main_move:
