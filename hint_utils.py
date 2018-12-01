@@ -220,10 +220,10 @@ class Generator:
                     else:
                         answer += ' ' + p + ' на ' + main_move[1:3] + '.'
             if len(answer) == 0:
-                return HintService.to_dict(answer='Вот вам лучший ход.', best=[moves[0]], mate=False)
+                return HintService.to_dict(answer='Лучше всего сходить ' + Generator.__piece(main_move[0], 't') + ' ' + main_move + '.', best=[moves[0]], mate=False)
             return HintService.to_dict(answer=answer, best=[moves[0]], mate=False)
         else:
-            return HintService.to_dict(answer='Вот вам возможные ходы.', best=moves)
+            return HintService.to_dict(answer='Вот возможные ходы.', best=moves)
 
     @staticmethod
     def __who_on(fen, cell):
