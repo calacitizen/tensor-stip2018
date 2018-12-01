@@ -276,16 +276,18 @@ class Generator:
 
     @staticmethod
     def secret_check(args):
+        cb = ChessBoard()
+        moves = cb.get_moves(args['fen'], args)
         board = chess.Board(fen=args['fen'])
-        if board.is_check():
-            return HintService.to_dict(answer='Кажется, вам поставили шах.')
+        if board.is_checkmate():
+            return HintService.to_dict(answer='Шах и мат!')
+        elif board.is_check():
+            return HintService.to_dict(answer='Кажется, вам поставили шах.', best=moves)
         elif board.is_stalemate():
-            return HintService.to_dict(answer='Мат!')
-        elif board.is_stalemate():
-            return HintService.to_dict(answer='Это пат.')
+            return HintService.to_dict(answer='Пат.')
         elif board.is_insufficient_material():
             return HintService.to_dict(answer='Ничья.')
-        return HintService.to_dict()
+        return HintService.to_dict(best=moves)
 
 
 class HintService:
