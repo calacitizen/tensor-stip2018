@@ -12,6 +12,8 @@ from logging import Formatter, FileHandler
 from forms import *
 import os
 from flask_cors import CORS
+from hint_utils import HintService
+from pandas import read_csv
 
 #----------------------------------------------------------------------------#
 # App Config.
@@ -137,7 +139,7 @@ def json_answer(best_moves, possible_moves, answer, mate):
         'best_moves': best_moves,
         'possible_moves': possible_moves,
         'answer': answer,
-        'mate' : mate
+        'mate': mate
     })
 
 def get_answer(state):
@@ -200,15 +202,14 @@ def hint():
             return json_answer([], [], 'Error: no board information sent', False)
         state = data['board']
         question = data['question']
-        new_answer = get_answer(state)
-        mate = False
-        #question = 'Какой лучший ход'
-        if question != '':
-            text = generate_text(question, new_answer)
-        new_answer = get_answer(state)
-        mate = False
-        #return json_answer(new_answer['best_moves'], new_answer['possible_moves'], text, mate)
-        return json_answer(new_answer['best_moves'], new_answer['possible_moves'], new_answer['answer'], mate)
+
+        csv = read_csv("data/dataset.tsv", sep='\t')
+        hint = HintService(knowledge=csv, send_score=True)
+        answer = hint.ask(question)
+
+        # TODO: check board
+
+        return json_answer([], [], answer, False)
     else:
         return json_answer([], [], 'Ошибка!', False)
 # Error handlers.

@@ -110,7 +110,7 @@ class Generator:
             return 'Так о чем Вы хотите узнать?'
         empty = True
         for k in args:
-            empty = empty or len(args[k]) == 0
+            empty = empty and len(args[k]) == 0
         if empty:
             return 'Так о чем Вы хотите узнать?'
         if len(args['piece']) > 0:
