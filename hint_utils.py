@@ -231,7 +231,7 @@ class Generator:
         if value != '.':
             return value
         else:
-            return 'пустая'
+            return 'пустую клетку'
 
     @staticmethod
     def whats(args):
