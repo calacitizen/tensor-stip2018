@@ -198,7 +198,7 @@ class Generator:
                              Generator.__piece(Generator.__who_on(args['fen'], moves[0]['full_move'][2:4]),
                                                'v') + ' на ' + moves[0]['full_move'][2:4] + '.'
             if '+' in main_move:
-                if answer[-1] == '.':
+                if len(answer)> 0 and answer[-1] == '.':
                     answer[-1] = ' '
                     answer += 'и поставить шах.'
                 else:
@@ -209,7 +209,7 @@ class Generator:
                     else:
                         answer += ' ' + p + ' на ' + main_move[1:3] + '.'
             if '#' in main_move:
-                if answer[-1] == '.':
+                if len(answer)> 0 and answer[-1] == '.':
                     answer[-1] = ' '
                     answer += 'и поставить мат.'
                 else:
