@@ -58,7 +58,6 @@ class ChessBoard:
             })
         moves.sort(key=lambda x: -x['score'], reverse=reverse)
         moves.sort(key=lambda x: not x['mate'], reverse=reverse)
-        print(moves)
         return moves
 
 
@@ -188,7 +187,6 @@ class Generator:
                 answer = 'Можно сделать рокировку с правой ладьей.'
             elif '=' in main_move:
                 answer = 'Предлагаю превратить пешку на ' + main_move[:2] + ' в ' + Generator.__piece(main_move[3], 'v') + '.'
-                print(main_move[2])
             elif 'x' in main_move:
                 #if Generator.__piece(main_move[0], 't') == 'пешкой':
                     answer = 'Предлагаю ' + Generator.__piece(main_move[0], 't') + ' на ' + moves[0]['full_move'][:2] +  ' съесть ' + \
@@ -303,7 +301,6 @@ class HintService:
 
     @staticmethod
     def __generate_answer(answer, args):
-        print(answer)
         if answer == 'secret':
             return Generator.secret_check(args)
         elif answer == 'no_token':
