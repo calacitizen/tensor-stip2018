@@ -3,8 +3,6 @@ Flask-SQLAlchemy
 Flask-WTF
 WTForms
 coverage
-python-chess
-flask_cors
 # ecdsa
 # paramiko
 # pycrypto
