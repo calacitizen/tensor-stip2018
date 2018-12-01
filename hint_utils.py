@@ -212,7 +212,7 @@ class Generator:
                         answer += ' ' + p + ' на ' + main_move[:2] + '.'
                     else:
                         answer += ' ' + p + ' на ' + main_move[1:3] + '.'
-            return HintService.to_dict(answer=answer, best=[moves[0]], mate=False)
+            return HintService.to_dict(answer=answer, best=moves, mate=False)
         else:
             return HintService.to_dict(answer='Вот вам возможные ходы.', best=moves)
 
