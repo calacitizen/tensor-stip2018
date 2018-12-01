@@ -5,6 +5,11 @@ WTForms
 coverage
 python-chess
 flask_cors
+numpy
+nltk
+pymorphy2
+pandas
+sklearn
 # ecdsa
 # paramiko
 # pycrypto
