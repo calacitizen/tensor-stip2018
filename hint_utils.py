@@ -11,12 +11,12 @@ from config import STOCKFISH_PATH
 from json import dumps
 
 PIECES = [
-    'пешка', 'ладья', 'конь',
-    'ферзь', 'слон', 'король'
+    'пешка', 'конь', 'слон',
+    'ладья', 'ферзь', 'король'
 ]
 
 RULE_TERMS = [
-    'мат', 'пат', 'ничья',
+    'мат', 'пат', 'шах',
     'рокировка'
 ]
 
@@ -24,8 +24,8 @@ PIECES_DIC = {
     'король': 6,
     'ферзь': 5,
     'ладья': 4,
-    'конь': 2,
     'слон': 3,
+    'конь': 2,
     'пешка': 1
 }
 
@@ -72,15 +72,22 @@ class Preprocess:
         data = {
             'token': None,
             'args': {
-                'piece': []
+                'piece': [],
+                'term': []
             }
         }
         words = [self.__morph.parse(word)[0].normal_form for word in self.__tokenizer.tokenize(sentence)]
         for piece in PIECES:
             if piece in words:
+
                 words.remove(piece)
-                if not piece in data['args']:
+                if piece not in data['args']['piece']:
                     data['args']['piece'].append(PIECES_DIC[piece])
+        for term in RULE_TERMS:
+            if term in words:
+                words.remove(term)
+                if term not in data['args']['term']:
+                    data['args']['term'].append(term)
         if len(words) > 0:
             data['token'] = ' '.join(words)
         return data
@@ -113,26 +120,26 @@ class Generator:
             return HintService.to_dict(answer='О какой фигуре речь?')
         result = ''
         for piece in args['piece']:
-            if piece == PIECES[0]:
+            if piece == 1:
                 result += 'Пешка ходит со взятием \
 по диагонали на одно поле вперёд-вправо или вперёд-\
 влево, а без взятия — по вертикали на одно поле вперёд. \
 Если пешка в данной партии ещё не делала ходов, она может \
 сделать ход без взятия на два поля вперёд. '
-            elif piece == PIECES[1]:
+            elif piece == 4:
                 result += 'Ладья ходит на любое расстояние \
 по вертикали или горизонтали.'
-            elif piece == PIECES[2]:
+            elif piece == 2:
                 result += 'Конь ходит на поле, находящееся \
 на расстоянии 2 по вертикали и 1 по горизонтали или 1 по \
 вертикали и 2 по горизонтали от текущего положения.'
-            elif piece == PIECES[3]:
+            elif piece == 5:
                 result += 'Ферзь ходит на любое расстояние \
 по вертикали, горизонтали или диагонали.'
-            elif piece == PIECES[4]:
+            elif piece == 3:
                 result += 'Слон ходит на любое \
 расстояние по диагонали.'
-            elif piece == PIECES[5]:
+            elif piece == 6:
                 result += 'Король ходит на расстояние 1 \
 по вертикали, горизонтали или диагонали.'
             else:
@@ -244,6 +251,17 @@ class Generator:
             return HintService.to_dict(answer='Так о чем Вы хотите узнать?')
         if len(args['piece']) > 0:
             return HintService.to_dict(answer='Это фигура в шахматах.')
+        elif len(args['term']) > 0:
+            if args['term'][0] == 'мат':
+                return HintService.to_dict(answer='Мат – это шах, от которого нет защиты, это конец партии.')
+            elif args['term'][0] == 'пат':
+                return HintService.to_dict(answer='Пат – это положение в шахматной партии, в котором сторона, имеющая право хода, не может им воспользоваться, так как все фигуры лишены возможности двигаться. Король в этот момент не находится под шахом.')
+            elif args['term'][0] == 'шах':
+                return HintService.to_dict(answer='Шах – это нападение на короля любой фигуры или пешки.')
+            elif args['term'][0] == 'рокировка':
+                return HintService.to_dict(answer='Рокировка – это ход в шахматах, при котором король перепрыгивает через одно поле вправо, или влево, а ладья закрывает его, вставая на соседнее поле. Рокировку могут делать и белые и черные. Рокировка бывает короткая и длинная. Короткая делается в сторону королевского фланга, длинная в сторону ферзевого фланга.')
+            else:
+                return HintService.to_dict(answer='Этого я не знаю.')
         else:
             return HintService.to_dict(answer='Этого я не знаю.')
 
