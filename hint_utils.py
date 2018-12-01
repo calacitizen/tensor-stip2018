@@ -11,8 +11,8 @@ from config import STOCKFISH_PATH
 from json import dumps
 
 PIECES = [
-    'пешка', 'ладья', 'конь',
-    'ферзь', 'слон', 'король'
+    'пешка', 'конь', 'слон',
+    'ладья', 'ферзь', 'король'
 ]
 
 RULE_TERMS = [
@@ -24,8 +24,8 @@ PIECES_DIC = {
     'король': 6,
     'ферзь': 5,
     'ладья': 4,
-    'конь': 2,
     'слон': 3,
+    'конь': 2,
     'пешка': 1
 }
 
@@ -79,6 +79,7 @@ class Preprocess:
         words = [self.__morph.parse(word)[0].normal_form for word in self.__tokenizer.tokenize(sentence)]
         for piece in PIECES:
             if piece in words:
+
                 words.remove(piece)
                 if piece not in data['args']['piece']:
                     data['args']['piece'].append(PIECES_DIC[piece])
@@ -119,26 +120,26 @@ class Generator:
             return HintService.to_dict(answer='О какой фигуре речь?')
         result = ''
         for piece in args['piece']:
-            if piece == PIECES[0]:
+            if piece == 1:
                 result += 'Пешка ходит со взятием \
 по диагонали на одно поле вперёд-вправо или вперёд-\
 влево, а без взятия — по вертикали на одно поле вперёд. \
 Если пешка в данной партии ещё не делала ходов, она может \
 сделать ход без взятия на два поля вперёд. '
-            elif piece == PIECES[1]:
+            elif piece == 4:
                 result += 'Ладья ходит на любое расстояние \
 по вертикали или горизонтали.'
-            elif piece == PIECES[2]:
+            elif piece == 2:
                 result += 'Конь ходит на поле, находящееся \
 на расстоянии 2 по вертикали и 1 по горизонтали или 1 по \
 вертикали и 2 по горизонтали от текущего положения.'
-            elif piece == PIECES[3]:
+            elif piece == 5:
                 result += 'Ферзь ходит на любое расстояние \
 по вертикали, горизонтали или диагонали.'
-            elif piece == PIECES[4]:
+            elif piece == 3:
                 result += 'Слон ходит на любое \
 расстояние по диагонали.'
-            elif piece == PIECES[5]:
+            elif piece == 6:
                 result += 'Король ходит на расстояние 1 \
 по вертикали, горизонтали или диагонали.'
             else:
