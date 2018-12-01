@@ -51,12 +51,14 @@ class ChessBoard:
                         continue
             moves.append({
                 "full_move": move.uci(),
-                "mate": False if mate is None else mate,
+                "mate": False if mate is None else (True if mate > 0 else False),
                 "move": board.san(move),
-                "score": round((999 if score is None else score) / 100.0, 2)
+                "score": round((0 if (score is None and mate is not None and mate < 0) else 999 \
+                    if (score is None and mate is not None and mate > 0) else score) / 100.0, 2)
             })
         moves.sort(key=lambda x: -x['score'], reverse=reverse)
         moves.sort(key=lambda x: not x['mate'], reverse=reverse)
+        print(moves)
         return moves
 
 
@@ -135,7 +137,7 @@ class Generator:
                 result += 'Король ходит на расстояние 1 \
 по вертикали, горизонтали или диагонали.'
             else:
-                result += 'А что за новая фигура такая - ' + piece + '?'
+                result += 'А что за новая фигура такая?'
         return HintService.to_dict(answer=result)
 
     @staticmethod
