@@ -203,7 +203,11 @@ class Generator:
             elif '=' in main_move:
                 answer = 'Предлагаю превратить пешку на ' + main_move[:2] + ' в ' + Generator.__piece(main_move[3], 'v') + '.'
             elif 'x' in main_move:
-                #if Generator.__piece(main_move[0], 't') == 'пешкой':
+                #  board = chess.BaseBoard(args['fen'].split()[0])
+                #  print('+++++++')
+                #  print(chess.SQUARE_NAMES.index(moves[0]['full_move'][2:4]))
+                #  print(board.piece_at(chess.SQUARE_NAMES.index(moves[0]['full_move'][2:4])))
+                if Generator.__piece(main_move[0], 't') == 'пешкой':
                     answer = 'Предлагаю ' + Generator.__piece(main_move[0], 't') + ' на ' + moves[0]['full_move'][:2] +  ' съесть ' + \
                              Generator.__piece(Generator.__who_on(args['fen'], moves[0]['full_move'][2:4]),
                                                'v') + ' на ' + moves[0]['full_move'][2:4] + '.'
