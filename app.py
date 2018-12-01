@@ -51,7 +51,7 @@ def generate_text(question, new_turn):
     if question[:16].lower() == 'какой лучший ход':
         best_move = new_turn['best_moves'][0]
         if 'x' in best_move['move']:
-            answer = 'Предлагаю ' + piece(best_move['move'][0], 't') + ' съесть ' + pice(who_on(best_move['full_move'][1:3]), 'v') + ' на ' + best_move['full_move'][1:3]
+            answer = 'Предлагаю ' + piece(best_move['move'][0], 't') + ' съесть ' + piece(who_on(best_move['full_move'][1:3]), 'v') + ' на ' + best_move['full_move'][1:3]
         else:
             answer = 'Предлагаю сходить ' + piece(best_move['move'][0], 't') + ' на ' + best_move['full_move'][1:3]
     print(answer)
@@ -157,7 +157,7 @@ def forgot():
     form = ForgotForm(request.form)
     return render_template('forms/forgot.html', form=form)
 
-state = '' # current board state
+state = 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1' # current board state
 @app.route('/hint', methods=['POST'])
 def hint():
     if request.method == 'POST':
