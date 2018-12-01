@@ -5,6 +5,10 @@ from nltk.tokenize import RegexpTokenizer
 from pymorphy2 import MorphAnalyzer
 from sklearn.feature_extraction.text import CountVectorizer as Vectorizer
 from sklearn.metrics.pairwise import cosine_similarity
+import chess
+import chess.uci
+from config import STOCKFISH_PATH
+from json import dumps
 
 PIECES = [
     'пешка', 'ладья', 'конь',
@@ -15,6 +19,37 @@ RULE_TERMS = [
     'мат', 'пат', 'ничья',
     'рокировка'
 ]
+
+
+class ChessBoard:
+
+    def __init__(self, movetime=10):
+        self.__engine = chess.uci.popen_engine(STOCKFISH_PATH)
+        self.__info_handler = chess.uci.InfoHandler()
+        self.__engine.info_handlers.append(self.__info_handler)
+        self.__movetime = movetime
+
+    def get_moves(self, fen, filt=None, reverse=False):
+        board = chess.Board(fen=fen)
+        self.__engine.position(board)
+        moves = []
+        for move in board.legal_moves:
+            self.__engine.go(movetime=self.__movetime, searchmoves=[move])
+            score, mate = self.__info_handler.info["score"][1]
+            piece_type = board.piece_type_at(move.from_square)
+            if filt is not None:
+                if 'piece' in filt:
+                    if piece_type not in filt['piece']:
+                        continue
+            moves.append({
+                "full_move": move.uci(),
+                "mate": False if mate is None else mate,
+                "move": board.san(move),
+                "score": round((999 if score is None else score) / 100.0, 2)
+            })
+        moves.sort(key=lambda x: -x['score'], reverse=reverse)
+        moves.sort(key=lambda x: not x['mate'], reverse=reverse)
+        return moves
 
 
 class Preprocess:
@@ -64,9 +99,9 @@ class Generator:
     @staticmethod
     def how_piece_goes(args):
         if args is None:
-            return 'О какой фигуре речь?'
+            return HintService.to_dict(answer='О какой фигуре речь?')
         if len(args['piece']) == 0:
-            return 'О какой фигуре речь?'
+            return HintService.to_dict(answer='О какой фигуре речь?')
         result = ''
         for piece in args['piece']:
             if piece == PIECES[0]:
@@ -93,67 +128,89 @@ class Generator:
 по вертикали, горизонтали или диагонали.'
             else:
                 result += 'А что за новая фигура такая - ' + piece + '?'
-        return result
+        return HintService.to_dict(answer=result)
 
     @staticmethod
-    def best_move(args):
+    def get_move(args, move_type='best'):
         if args is None:
-            return 'Чем ходить будете?'
-        if len(args['piece']) > 0:
-            return 'Чтобы посчитать ходы для фигур %s, нужно дописать функцию!' % ' '.join(args['piece'])
+            return HintService.to_dict(answer='Чем ходить будете?')
+        # TODO: filter
+        cb = ChessBoard()
+        moves = cb.get_moves(args['fen'])
+        if len(moves) == 0:
+            return HintService.to_dict(answer='Доступных ходов нет.')
+        if move_type == 'best':
+            return HintService.to_dict(answer='Вот вам лучший ход.', best=[moves[0]], mate=False)
         else:
-            return 'Пока не умею делать этого.'
+            return HintService.to_dict(answer='Вот вам возможные ход.', best=moves)
 
     @staticmethod
     def whats(args):
         if args is None:
-            return 'Так о чем Вы хотите узнать?'
+            return HintService.to_dict(answer='Так о чем Вы хотите узнать?')
         empty = True
         for k in args:
             empty = empty and len(args[k]) == 0
         if empty:
-            return 'Так о чем Вы хотите узнать?'
+            return HintService.to_dict(answer='Так о чем Вы хотите узнать?')
         if len(args['piece']) > 0:
-            return 'Это фигура в шахматах.'
+            return HintService.to_dict(answer='Это фигура в шахматах.')
         else:
-            return 'Этого я не знаю.'
+            return HintService.to_dict(answer='Этого я не знаю.')
+
+    @staticmethod
+    def whats_on(args):
+        if args is None:
+            return HintService.to_dict(answer='А какие координаты у фигуры?')
+        if len(args['square']) == 0:
+            return HintService.to_dict(answer='А какие координаты у фигуры?')
+        # TODO: check piece
+        return HintService.to_dict(answer='В разработке.')
 
 
 class HintService:
 
-    def __init__(self, knowledge, treshold=0.7, send_score=False):
+    def __init__(self, knowledge, threshold=0.8):
         self.__preproc = Preprocess()
         self.__preproc.fit(knowledge['question'])
         self.__answer = knowledge['answer']
-        self.__treshold = treshold
-        self.__send_score = send_score
+        self.__threshold = threshold
 
-    def ask(self, question):
-        result = ''
+    @staticmethod
+    def to_dict(answer='', best=[], possible=[], mate=False):
+        return dumps({
+            'answer': answer,
+            'best_moves': best,
+            'possible_moves': possible,
+            'mate': mate
+        })
+
+    def ask(self, fen, question):
         answer = self.__preproc.transform(question)
+        answer['args']['fen'] = fen
+        # TODO: check fen
         if answer['token'] is None:
-            return self.__generate_answer('no_token', answer['args'])
-        if self.__send_score:
-            result += '[%f] ' % answer['score']
-        if answer['score'] > self.__treshold:
-            if self.__answer[answer['index']]:
-                result += self.__generate_answer(self.__answer[answer['index']], answer['args'])
-            else:
-                result += self.__answer[answer['index']]
-        else:
-            result += self.__generate_answer('no_answer', answer['args'])
-        return result
+            return HintService.__generate_answer('no_token', answer['args'])
+        if answer['score'] > self.__threshold:
+            return HintService.__generate_answer(self.__answer[answer['index']], answer['args'])
+        return HintService.__generate_answer('no_answer', answer['args'])
 
-    def __generate_answer(self, answer, args):
+    @staticmethod
+    def __generate_answer(answer, args):
+        print(answer)
         if answer == 'no_token':
-            return 'Что Вы имеете в виду?'
+            return HintService.to_dict(answer='Что Вы имеете в виду?')
         elif answer == 'no_answer':
-            return 'Я не знаю, как ответить на Ваш вопрос.'
+            return HintService.to_dict(answer='Я не знаю, как ответить на Ваш вопрос.')
         elif answer == 'how_piece_goes':
             return Generator.how_piece_goes(args)
         elif answer == 'best_move':
-            return Generator.best_move(args)
+            return Generator.get_move(args)
         elif answer == 'whats':
             return Generator.whats(args)
+        elif answer == 'available_moves':
+            return Generator.get_move(args, move_type='possible')
+        elif answer == 'whats_on':
+            return Generator.whats_on(args)
         else:
-            return 'Я не ожидала такого вопроса.'
+            return HintService.to_dict(answer='Я не ожидала такого вопроса.')
