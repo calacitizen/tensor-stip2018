@@ -9,6 +9,7 @@ question	answer
 Какие возможные ходы	available_moves
 Как я могу сходить	available_moves
 Какие ходы мне доступны	available_moves
+Куда сходить	available_moves
 Доступные ходы	available_moves
 Возможные ходы	available_moves
 Что стоит на позиции	whats_on
