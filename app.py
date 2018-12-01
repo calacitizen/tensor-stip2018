@@ -59,7 +59,7 @@ def get_answer(state):
     if state in game:
         return game[state]
     else:
-        return ([], [], 'answer', False) 
+        return json_answer([], [], 'no such state in test', False) 
 
 
 
