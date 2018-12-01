@@ -17,7 +17,7 @@ SQLALCHEMY_DATABASE_URI = 'sqlite:///' + os.path.join(basedir, 'database.db')
 
 if _platform == "linux" or _platform == "linux2":
     # linux
-    STOCKFISH_PATH = "../stockfish_10_x64"
+    STOCKFISH_PATH = "stockfish_10_x64"
     pass
 elif _platform == "darwin":
     # MAC OS X
