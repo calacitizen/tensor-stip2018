@@ -21,20 +21,13 @@ RULE_TERMS = [
 ]
 
 PIECES_DIC = {
-    'K': ['король', 'короля', 'королю', 'короля', 'королем', 'короле'],
-    'Q': ['ферзь', 'ферзя', 'ферзю', 'ферзя', 'ферзем', 'ферзе'],
-    'R': ['ладья', 'ладьи', 'ладье', 'ладью', 'ладьей', 'ладье'],
-    'N': ['конь', 'коня', 'коню', 'коня', 'конем', 'коне'],
-    'B': ['слон', 'слона', 'слону', 'слона', 'слоном', 'слоне'],
-    '&': ['пешка', 'пешки', 'пешке', 'пешку', 'пешкой', 'пешке']
+    'король': 6,
+    'ферзь': 5,
+    'ладья': 4,
+    'конь': 2,
+    'слон': 3,
+    'пешка': 1
 }
-
-OPERATIONS = {
-    'x': ['атаковать', 'съесть'],
-    '+': ['поставить шах'],
-    '#': ['объявить мат']
-}
-
 
 class ChessBoard:
 
@@ -86,7 +79,7 @@ class Preprocess:
             if piece in words:
                 words.remove(piece)
                 if not piece in data['args']:
-                    data['args']['piece'].append(piece)
+                    data['args']['piece'].append(PIECES_DIC[piece])
         if len(words) > 0:
             data['token'] = ' '.join(words)
         return data
@@ -178,9 +171,8 @@ class Generator:
     def get_move(args, move_type='best'):
         if args is None:
             return HintService.to_dict(answer='Кажется, кто-то спрятал от меня шахматную доску?')
-        # TODO: filter
         cb = ChessBoard()
-        moves = cb.get_moves(args['fen'])
+        moves = cb.get_moves(args['fen'], args)
         if len(moves) == 0:
             return HintService.to_dict(answer='Доступных ходов нет.')
         if move_type == 'best':
@@ -191,7 +183,8 @@ class Generator:
             elif 'O-O' in main_move:
                 answer = 'Можно сделать рокировку с правой ладьей.'
             elif '=' in main_move:
-                answer = 'Предлагаю превратить пешку на ' + main_move[:2] + ' в ' + Generator.__piece(main_move[2], 'v') + '.'
+                answer = 'Предлагаю превратить пешку на ' + main_move[:2] + ' в ' + Generator.__piece(main_move[2],
+                                                                                                      'v') + '.'
             elif 'x' in main_move:
                 if Generator.__piece(main_move[0], 't') == 'пешкой':
                     answer = 'Предлагаю ' + Generator.__piece(main_move[0], 't') + ' съесть ' + \
@@ -219,8 +212,6 @@ class Generator:
                         answer += ' ' + p + ' на ' + main_move[:2] + '.'
                     else:
                         answer += ' ' + p + ' на ' + main_move[1:3] + '.'
-            if len(answer) == 0:
-                return HintService.to_dict(answer='Вот вам лучший ход.', best=[moves[0]], mate=False)
             return HintService.to_dict(answer=answer, best=[moves[0]], mate=False)
         else:
             return HintService.to_dict(answer='Вот вам возможные ходы.', best=moves)
@@ -232,7 +223,6 @@ class Generator:
         for j in range(0, 8):
             for i in range(0, 9):
                 board[j] = board[j].replace(str(i), '.' * i)
-        # белые обозначаются большими буквами
         value = board[7 - (int(cell[1]) - 1)][ord(cell[0]) - a].upper()
         if value != '.':
             return value
