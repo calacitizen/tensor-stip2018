@@ -46,7 +46,7 @@ class ChessBoard:
             score, mate = self.__info_handler.info["score"][1]
             piece_type = board.piece_type_at(move.from_square)
             if filt is not None:
-                if 'piece' in filt:
+                if 'piece' in filt and len(filt['piece']) > 0:
                     if piece_type not in filt['piece']:
                         continue
             moves.append({
