@@ -1,12 +1,16 @@
 question	answer
 Как лучше сходить	best_move
 Какой ход лучше сделать	best_move
+Как выгоднее сходить	best_move
 Как ходит	how_piece_goes
 Как передвигается	how_piece_goes
 Что такое	whats
 Какие доступные ходы	available_moves
 Какие возможные ходы	available_moves
 Как я могу сходить	available_moves
+Какие ходы мне доступны	available_moves
+Доступные ходы	available_moves
+Возможные ходы	available_moves
 Что стоит на позиции	whats_on
 Какая фигура находится на позиции	whats_on
 Что находится на позиции	whats_on
