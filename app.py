@@ -50,9 +50,9 @@ def generate_text(question, new_turn):
     answer = ''
     if question[:16].lower() == 'какой лучший ход':
         best_move = new_turn['best_moves'][0]
-        if 'x' in best_move['move']:
-            answer = 'Предлагаю ' + piece(best_move['move'][0], 't') + ' съесть ' + piece(who_on(best_move['full_move'][1:3]), 'v') + ' на ' + best_move['full_move'][1:3]
-        else:
+        answer = ''
+        answer = special_events(best_move['move', best_move['full_move']])
+        if answer == '':
             answer = 'Предлагаю сходить ' + piece(best_move['move'][0], 't') + ' на ' + best_move['full_move'][1:3]
     print(answer)
     return answer
@@ -70,6 +70,40 @@ def who_on(cell):
     else:
         return 'Empty'
 
+def special_events(string, full_move):
+    result = ''
+    if 'O-O-O' in string:
+        result = 'Можно сделать рокировку с левой ладьей.'
+    elif 'O-O' in string:
+        result = 'Можно сделать рокировку с правой ладьей.'
+    if '=' in string:
+        result = 'Предлагаю превратить пешку на ' + string[:2] + ' в ' + piece(string[2], 'v') + '.'
+    if 'x' in string:
+        if piece(string[0], 't') == 'пешкой':
+            result = 'Предлагаю ' + piece(string[0], 't') + ' съесть ' + piece(who_on(full_move[2:4]), 'v') + ' на ' + full_move[2:4] + '.'
+    if '+' in string:
+        if result[-1] == '.':
+            result[-1] = ' '
+            result = result + 'и поставить шах.'
+        else:
+            result = 'Можно поставить шах, сходив'
+            p =  piece(string[0], 't')
+            if p == 'пешкой':
+                result = result + ' ' + p + ' на ' + string[:2] + '.'
+            else:
+                result = result + ' ' + p + ' на ' + string[1:3] + '.'
+    if '#' in string:
+        if result[-1] == '.':
+            result[-1] = ' '
+            result = result + 'и поставить мат.'
+        else:
+            result = 'Есть возможность поставить мат, сходив'
+            p =  piece(string[0], 't')
+            if p == 'пешкой':
+                result = result + ' ' + p + ' на ' + string[:2] + '.'
+            else:
+                result = result + ' ' + p + ' на ' + string[1:3] + '.'
+    return  result
 def piece(char, case):
     pieces = {
         't': {
