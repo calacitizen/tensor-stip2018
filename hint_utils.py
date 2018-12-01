@@ -216,7 +216,7 @@ class Generator:
                 return HintService.to_dict(answer='Лучше всего сходить ' + Generator.__piece(main_move[0], 't') + ' ' + main_move + '.', best=[moves[0]], mate=False)
             return HintService.to_dict(answer=answer, best=moves, mate=False)
         else:
-            return HintService.to_dict(answer='Вот возможные ходы.', best=moves)
+            return HintService.to_dict(answer='Вот возможные ходы.', possible=moves)
 
     @staticmethod
     def __who_on(fen, cell):
