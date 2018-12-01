@@ -60,10 +60,10 @@ def generate_text(question, new_turn):
 def who_on(cell):
     a = ord('a')
     board = state.split('/')
-    for j in range(0,8):
-        for i in range(0,9):
-            board[j] = board[j].replace(str(i), '.'*i)
-    #белые обозначаются большими буквами
+    for j in range(0, 8):
+        for i in range(0, 9):
+            board[j] = board[j].replace(str(i), '.' * i)
+    # белые обозначаются большими буквами
     value = board[7 - (int(cell[1]) - 1)][ord(cell[0]) - a].upper()
     if value != '.':
         return value
