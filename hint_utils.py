@@ -167,6 +167,19 @@ class Generator:
         # TODO: check piece
         return HintService.to_dict(answer='В разработке.')
 
+    @staticmethod
+    def secret_check(args):
+        board = chess.Board(fen=args['fen'])
+        if board.is_check():
+            return HintService.to_dict(answer='Шах!')
+        elif board.is_stalemate():
+            return HintService.to_dict(answer='Мат!')
+        elif board.is_stalemate():
+            return HintService.to_dict(answer='Пат!')
+        elif board.is_insufficient_material():
+            return HintService.to_dict(answer='Ничья!')
+        return HintService.to_dict()
+
 
 class HintService:
 
@@ -186,6 +199,8 @@ class HintService:
         })
 
     def ask(self, fen, question):
+        if question == '':
+            return HintService.__generate_answer('secret', {'fen': fen})
         answer = self.__preproc.transform(question)
         answer['args']['fen'] = fen
         # TODO: check fen
@@ -198,7 +213,9 @@ class HintService:
     @staticmethod
     def __generate_answer(answer, args):
         print(answer)
-        if answer == 'no_token':
+        if answer == 'secret':
+            return Generator.secret_check(args)
+        elif answer == 'no_token':
             return HintService.to_dict(answer='Что Вы имеете в виду?')
         elif answer == 'no_answer':
             return HintService.to_dict(answer='Я не знаю, как ответить на Ваш вопрос.')
