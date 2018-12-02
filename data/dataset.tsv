@@ -1,5 +1,6 @@
 question	answer
 Как лучше сходить	best_move
+Как лучше ходить	best_move
 Какой ход лучше сделать	best_move
 Как выгоднее сходить	best_move
 Как ходит	how_piece_goes

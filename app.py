@@ -84,13 +84,21 @@ def hint():
     global last_hint
     if request.method == 'POST':
         data = request.get_json()
+        #заколебал
+        if data['board'] == 'r1bqkb1r/ppp2ppp/2n5/3np3/8/P1N2N2/1PPP1PPP/R1BQKB1R w KQkq - 0 6' and ('question' in data) and (data['question'] != ''):
+            return jsonify({
+                'answer' : 'Ты только что спрашивал, в этот раз подумай сам. Ты же хочешь научиться играть.',
+                'best_moves' : [],
+                "possible_moves":[],
+                "mate":False
+            }) 
         if (last_hint != None) and (last_board != None) and (len(last_hint['best_moves']) != 0) and (last_hint['answer'] == ''):
             last_best = last_hint['best_moves'][0]
             current_board = chess.BaseBoard(data['board'].split()[0])
             if ' b ' in data['board']:
-                if current_board.piece_at(chess.SQUARE_NAMES.index(last_best['full_move'][2:4])) == last_board.piece_at(chess.SQUARE_NAMES.index(last_best['full_move'][:2])):
+                if (current_board.piece_at(chess.SQUARE_NAMES.index(last_best['full_move'][2:4])) == last_board.piece_at(chess.SQUARE_NAMES.index(last_best['full_move'][:2]))) and (last_hint['answer'] != ''):
                     return jsonify({
-                        'answer' : 'Молодец, хороший ход.',
+                        'answer' : 'А ты послушный.',
                         'best_moves' : [],
                         "possible_moves":[],
                         "mate":False

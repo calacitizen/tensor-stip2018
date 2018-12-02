@@ -197,9 +197,9 @@ class Generator:
             #  moves[0]['full_move'] = 'e2e4'
             answer = ''
             if 'O-O-O' in main_move:
-                answer = 'Можно сделать рокировку с левой ладьей.'
+                answer = 'Хм, сложная ситуация, надо посоветоваться со знакомым гроссмейстером. Я бы сделал рокировку. Я бы тоже.'
             elif 'O-O' in main_move:
-                answer = 'Можно сделать рокировку с правой ладьей.'
+                answer = 'Хм, сложная ситуация, надо посоветоваться со знакомым гроссмейстером. Я бы сделал рокировку. Я бы тоже.'
             elif '=' in main_move:
                 answer = 'Предлагаю превратить пешку на ' + main_move[:2] + ' в ' + Generator.__piece(main_move[3], 'v') + '.'
             elif 'x' in main_move:
@@ -227,7 +227,6 @@ class Generator:
                     answer[-1] = ' '
                     answer += 'и поставить мат.'
                 else:
-                    answer = 'Есть возможность поставить мат, сходив'
                     p = Generator.__piece(main_move[0], 't')
                     if p == 'пешкой':
                         answer += ' ' + p + ' на ' + main_move[:2] + '.'
@@ -292,7 +291,9 @@ class Generator:
         moves = cb.get_moves(args['fen'], args)
         board = chess.Board(fen=args['fen'])
         if board.is_checkmate():
-            return HintService.to_dict(answer='Шах и мат!')
+            return HintService.to_dict(answer='Шах и мат, ничего удивительного!', mate=True)
+        elif len(moves) and ('mate' in moves[0]) and moves[0]['mate']:
+            return HintService.to_dict(answer='Вижу мат в один ход.', best=moves)
         elif board.is_check():
             return HintService.to_dict(answer='Кажется, вам поставили шах.', best=moves)
         elif board.is_stalemate():
